@@ -62,6 +62,12 @@ cargo test
 npm run frontend:build
 ```
 
+## Flujo Git y contribución
+
+- Reglas de colaboración: `CONTRIBUTING.md`
+- Runbook operativo Git y recuperación: `docs/git-playbook.md`
+- Plantilla PR y owners: `.github/PULL_REQUEST_TEMPLATE.md`, `.github/CODEOWNERS`
+
 ## Bateria E2E por script
 
 Para ejecutar un flujo completo que crea archivos temporales, aplica cambios,
