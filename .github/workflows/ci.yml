@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  commit-policy:
+    name: ci/commit-policy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate Conventional Commits
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title || '' }}
+        run: |
+          set -euo pipefail
+
+          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9][a-z0-9._/-]*\))?!?: .+'
+          zero_sha='0000000000000000000000000000000000000000'
+          failures=0
+
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            if ! printf '%s\n' "$PR_TITLE" | grep -Eq "$pattern"; then
+              echo "PR title is not Conventional Commit compatible: '$PR_TITLE'"
+              failures=1
+            fi
+          fi
+
+          if [[ -n "${BASE_SHA:-}" && "$BASE_SHA" != "$zero_sha" ]]; then
+            range="$BASE_SHA..$HEAD_SHA"
+            mapfile -t messages < <(git log --format=%s "$range")
+          else
+            mapfile -t messages < <(git log -1 --format=%s "$HEAD_SHA")
+          fi
+
+          if [[ ${#messages[@]} -eq 0 ]]; then
+            echo "No commit messages found to validate."
+            failures=1
+          fi
+
+          for msg in "${messages[@]}"; do
+            if [[ "$msg" =~ ^Merge\  ]]; then
+              continue
+            fi
+            if ! printf '%s\n' "$msg" | grep -Eq "$pattern"; then
+              echo "Invalid commit subject: '$msg'"
+              failures=1
+            fi
+          done
+
+          if [[ "$failures" -ne 0 ]]; then
+            echo "Conventional Commit policy failed."
+            exit 1
+          fi
+
+  rust-fmt-clippy:
+    name: ci/rust-fmt-clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: cargo fmt --check
+        run: cargo fmt --check
+
+      - name: cargo clippy
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+  rust-test:
+    name: ci/rust-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: cargo test
+        run: cargo test --workspace
+
+  e2e-battery:
+    name: ci/e2e-battery
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run semantic e2e battery
+        run: bash tests/semantic_e2e_battery.sh
+
+  frontend-build:
+    name: ci/frontend-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Build frontend
+        run: npm run frontend:build

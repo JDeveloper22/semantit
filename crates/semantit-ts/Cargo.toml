@@ -1,0 +1,18 @@
+[package]
+name = "semantit-ts"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+semantit-core = { path = "../semantit-core" }
+serde_json.workspace = true
+swc_common.workspace = true
+swc_ecma_ast.workspace = true
+swc_ecma_codegen.workspace = true
+swc_ecma_parser.workspace = true
+swc_ecma_visit.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
