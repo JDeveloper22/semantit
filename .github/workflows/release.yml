@@ -1,0 +1,92 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag (v0.x.y or v0.x.y-rc.n)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  checks: read
+
+jobs:
+  tag-and-release:
+    name: release/tag-and-notes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate tag format
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ inputs.version }}"
+          if ! [[ "$tag" =~ ^v0\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]]; then
+            echo "Invalid tag format: $tag"
+            exit 1
+          fi
+
+      - name: Ensure required CI checks are green on target SHA
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const required = [
+              'ci/rust-fmt-clippy',
+              'ci/rust-test',
+              'ci/e2e-battery',
+              'ci/frontend-build',
+              'ci/commit-policy',
+            ];
+            const { owner, repo } = context.repo;
+            const ref = context.sha;
+            const response = await github.rest.checks.listForRef({
+              owner,
+              repo,
+              ref,
+              per_page: 100,
+            });
+
+            const checks = new Map();
+            for (const run of response.data.check_runs) {
+              checks.set(run.name, run);
+            }
+
+            const failures = [];
+            for (const name of required) {
+              const run = checks.get(name);
+              if (!run) {
+                failures.push(`${name}: missing`);
+                continue;
+              }
+              if (run.status !== 'completed' || run.conclusion !== 'success') {
+                failures.push(`${name}: ${run.status}/${run.conclusion}`);
+              }
+            }
+
+            if (failures.length > 0) {
+              core.setFailed(`Required checks are not green on ${ref}: ${failures.join(', ')}`);
+            }
+
+      - name: Create annotated tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ inputs.version }}"
+          if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "Tag already exists locally: $tag"
+            exit 1
+          fi
+          git tag -a "$tag" -m "release $tag"
+          git push origin "$tag"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          generate_release_notes: true
