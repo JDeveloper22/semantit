@@ -4,14 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches:
-      - main
-      - "codex/**"
-      - "feat/**"
-      - "fix/**"
-      - "chore/**"
-      - "docs/**"
-      - "hotfix/**"
+    branches: [main]
 
 permissions:
   contents: read
