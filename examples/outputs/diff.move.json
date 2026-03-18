@@ -1,0 +1,96 @@
+{
+  "old_path": "fixtures/typescript/move_old.ts",
+  "new_path": "fixtures/typescript/move_new.ts",
+  "matching_strategy": "id, then conservative shape/body similarity",
+  "summary": {
+    "unchanged": 0,
+    "moved": 2,
+    "signature_changed": 0,
+    "implementation_changed": 0,
+    "renamed": 0,
+    "inserted": 0,
+    "deleted": 0,
+    "split": 0,
+    "merged": 0
+  },
+  "changes": [
+    {
+      "anchor_id": "7b372aa53b50d400ec635489ac946347ef21b8e232e4695443c0bf247c02d86d",
+      "kinds": [
+        "moved"
+      ],
+      "previous": {
+        "id": "7b372aa53b50d400ec635489ac946347ef21b8e232e4695443c0bf247c02d86d",
+        "kind": "function",
+        "name": "bar",
+        "path": "bar",
+        "signature": "function bar(value:number)number",
+        "body_hash": "3cc60f253025f3322607c0faff4fba9daaa14968267fb0adce858b0158b7f1e9",
+        "full_hash": "9d08a66a442e3cd30214504776d31652531798de2c976823bddccd38eb169e44",
+        "signature_hash": "9f0dee7b2d17a4a054878e8db4ae52a32a10976a3a44ea9df0ce5d2697157db6",
+        "shape_hash": "df1a444ce1cd87f5b4ec16c418699e5b31d92c804f1e68dbd15e0de33400e971",
+        "snippet": "function bar(value: number): number {\n  return value * 2;\n}",
+        "body": "{return value*2;}"
+      },
+      "current": {
+        "id": "7b372aa53b50d400ec635489ac946347ef21b8e232e4695443c0bf247c02d86d",
+        "kind": "function",
+        "name": "bar",
+        "path": "bar",
+        "signature": "function bar(value:number)number",
+        "body_hash": "3cc60f253025f3322607c0faff4fba9daaa14968267fb0adce858b0158b7f1e9",
+        "full_hash": "9d08a66a442e3cd30214504776d31652531798de2c976823bddccd38eb169e44",
+        "signature_hash": "9f0dee7b2d17a4a054878e8db4ae52a32a10976a3a44ea9df0ce5d2697157db6",
+        "shape_hash": "df1a444ce1cd87f5b4ec16c418699e5b31d92c804f1e68dbd15e0de33400e971",
+        "snippet": "function bar(value: number): number {\n  return value * 2;\n}",
+        "body": "{return value*2;}"
+      },
+      "related_entities": [],
+      "context": {
+        "before": "function bar(value: number): number {\n  return value * 2;\n}",
+        "after": "function bar(value: number): number {\n  return value * 2;\n}",
+        "unified_diff": ""
+      },
+      "explanation": "Entity `bar` -> `bar` was moved."
+    },
+    {
+      "anchor_id": "b742ab87bca489d9c36eeeaefc3b7ce540ce5ed2e3326f5336d673049934ba66",
+      "kinds": [
+        "moved"
+      ],
+      "previous": {
+        "id": "b742ab87bca489d9c36eeeaefc3b7ce540ce5ed2e3326f5336d673049934ba66",
+        "kind": "function",
+        "name": "foo",
+        "path": "foo",
+        "signature": "function foo(value:number)number",
+        "body_hash": "6999cd120eb5b1f34b6fb621914b3230ecba24e68c8b0ea76ed3c7c72d2d4af2",
+        "full_hash": "8bf0c3a39db7ebd3997ee8c7c367b56beee781b1fad1581df88d451ed17eb691",
+        "signature_hash": "37d2c479e355679b82db1a85b675a8144b1b582cccc9428abad54577561dc15f",
+        "shape_hash": "df1a444ce1cd87f5b4ec16c418699e5b31d92c804f1e68dbd15e0de33400e971",
+        "snippet": "function foo(value: number): number {\n  return value + 1;\n}",
+        "body": "{return value+1;}"
+      },
+      "current": {
+        "id": "b742ab87bca489d9c36eeeaefc3b7ce540ce5ed2e3326f5336d673049934ba66",
+        "kind": "function",
+        "name": "foo",
+        "path": "foo",
+        "signature": "function foo(value:number)number",
+        "body_hash": "6999cd120eb5b1f34b6fb621914b3230ecba24e68c8b0ea76ed3c7c72d2d4af2",
+        "full_hash": "8bf0c3a39db7ebd3997ee8c7c367b56beee781b1fad1581df88d451ed17eb691",
+        "signature_hash": "37d2c479e355679b82db1a85b675a8144b1b582cccc9428abad54577561dc15f",
+        "shape_hash": "df1a444ce1cd87f5b4ec16c418699e5b31d92c804f1e68dbd15e0de33400e971",
+        "snippet": "function foo(value: number): number {\n  return value + 1;\n}",
+        "body": "{return value+1;}"
+      },
+      "related_entities": [],
+      "context": {
+        "before": "function foo(value: number): number {\n  return value + 1;\n}",
+        "after": "function foo(value: number): number {\n  return value + 1;\n}",
+        "unified_diff": ""
+      },
+      "explanation": "Entity `foo` -> `foo` was moved."
+    }
+  ]
+}
